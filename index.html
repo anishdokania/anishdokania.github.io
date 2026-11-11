@@ -152,7 +152,7 @@ h1 em { font-style: normal; display: block; color: transparent; -webkit-text-str
 
 /* Sections */
 section.block { border-top: 1px solid var(--line); }
-section.block > .wrap { padding-block: 84px; display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 44px; }
+section.block > .wrap { padding-block: 68px; display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 44px; }
 .label { position: sticky; top: 92px; align-self: start; }
 .label .mono { display: block; color: var(--accent); margin-bottom: 8px; }
 h2 { font: 700 1.5rem/1.15 var(--display); margin: 0; letter-spacing: -.025em; }
@@ -242,6 +242,30 @@ h2 { font: 700 1.5rem/1.15 var(--display); margin: 0; letter-spacing: -.025em; }
 .toolkit dd { margin: 0; display: flex; flex-wrap: wrap; gap: 7px; }
 .toolkit dd span { font: 400 .78rem var(--mono); color: var(--soft); background: var(--surface); border: 1px solid var(--line); padding: 4px 10px; border-radius: 8px; }
 
+/* Click-to-expand */
+summary { list-style: none; cursor: pointer; }
+summary::-webkit-details-marker { display: none; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; border-radius: 6px; }
+.hint::after { content: "+ details"; color: var(--muted); transition: color .15s; }
+details[open] > summary .hint::after { content: "− hide"; }
+summary:hover .hint::after { color: var(--accent); }
+.role summary .hint { display: block; margin-top: 12px; }
+.role summary:hover h3 { color: var(--accent); }
+.role h3 { transition: color .15s; }
+.role h3 .org { display: inline; color: var(--muted); font: 500 1rem var(--body); letter-spacing: 0; margin: 0; }
+.role ul { margin-top: 16px; }
+.quote.plain { background: var(--surface); border-color: var(--line); color: var(--soft); }
+details.more > summary, details.full > summary { padding: 14px 0; color: var(--fg); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; }
+details.more { margin-top: 20px; }
+details.full { margin-top: 8px; }
+details.full .toolkit { padding-top: 22px; }
+.core { display: flex; flex-wrap: wrap; gap: 8px; margin: 30px 0 14px; }
+.core span { font: 500 .84rem var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--line); padding: 7px 13px; border-radius: 9px; }
+.prose p:only-child { margin: 0; }
+.figure p { font-size: 1rem; }
+.award p { font-family: var(--mono); font-size: .8rem; letter-spacing: .04em; }
+.roles { gap: 34px; }
+
 /* Contact */
 .contact { position: relative; isolation: isolate; overflow: hidden; }
 .contact::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(50% 80% at 50% 110%, rgba(242,178,72,.16), transparent 70%); }
@@ -300,10 +324,10 @@ footer .wrap { padding-block: 26px; display: flex; justify-content: space-betwee
       Anish Dokania
     </a>
     <nav aria-label="Sections">
-      <a class="opt" href="#about">About</a>
       <a class="opt2" href="#experience">Experience</a>
       <a class="opt2" href="#projects">Projects</a>
       <a class="opt" href="#awards">Awards</a>
+      <a class="opt" href="#skills">Skills</a>
       <a class="cta" href="#contact">Contact</a>
     </nav>
   </div>
@@ -315,12 +339,11 @@ footer .wrap { padding-block: 26px; display: flex; justify-content: space-betwee
       <div>
         <div class="mono rise">Houston, TX · UH Computer Science ’26 · 2× hackathon winner</div>
         <h1 class="rise d1">Anish <em>Dokania</em></h1>
-        <p class="lede rise d2">I build systems where <strong>markets, machine learning and AI</strong> meet. A churn model in production at Allstate, data pipelines for NASA-funded balloon missions, and an options-trading research stack of my own.</p>
+        <p class="lede rise d2">I build systems where <strong>markets, machine learning and AI</strong> meet.</p>
         <div class="actions rise d3">
           <a class="btn primary" href="#projects">See my work</a>
           <a class="btn" href="Anish-Dokania-Resume.pdf" download>Resume ↓</a>
           <a class="btn" href="https://www.linkedin.com/in/anishdokania/" target="_blank" rel="noopener">LinkedIn ↗</a>
-          <a class="btn" href="https://github.com/anishdokania" target="_blank" rel="noopener">GitHub ↗</a>
         </div>
       </div>
       <figure class="chart track rise d2" aria-label="My career so far as a chart. Each point is a milestone you can select.">
@@ -354,62 +377,34 @@ footer .wrap { padding-block: 26px; display: flex; justify-content: space-betwee
     </div>
   </div>
 
-  <div class="tape" aria-label="Career highlights">
-    <div class="tape-track">
-      <div class="tape-set">
-        <div class="tick"><b>ALLSTATE</b><span>churn model AUC</span><i>▲ 0.84</i></div>
-        <div class="tick"><b>SCALE</b><span>policyholders covered</span><i>▲ 5M+</i></div>
-        <div class="tick"><b>ROWDYHACKS</b><span>Best Overall App</span><i>▲ 1st of 87</i></div>
-        <div class="tick"><b>NASA USIP</b><span>datapoints per flight</span><i>▲ 75K+</i></div>
-        <div class="tick"><b>UH</b><span>GPA</span><i>▲ 3.72</i></div>
-        <div class="tick"><b>IDEATHON</b><span>Best College Campus Solution</span><i>▲ 3rd of 56</i></div>
-        <div class="tick"><b>ASL MODEL</b><span>accuracy</span><i>▲ 92%</i></div>
-        <div class="tick"><b>BACKTEST</b><span>simulated trades</span><i>▲ 850+</i></div>
-      </div>
-      <div class="tape-set" aria-hidden="true">
-        <div class="tick"><b>ALLSTATE</b><span>churn model AUC</span><i>▲ 0.84</i></div>
-        <div class="tick"><b>SCALE</b><span>policyholders covered</span><i>▲ 5M+</i></div>
-        <div class="tick"><b>ROWDYHACKS</b><span>Best Overall App</span><i>▲ 1st of 87</i></div>
-        <div class="tick"><b>NASA USIP</b><span>datapoints per flight</span><i>▲ 75K+</i></div>
-        <div class="tick"><b>UH</b><span>GPA</span><i>▲ 3.72</i></div>
-        <div class="tick"><b>IDEATHON</b><span>Best College Campus Solution</span><i>▲ 3rd of 56</i></div>
-        <div class="tick"><b>ASL MODEL</b><span>accuracy</span><i>▲ 92%</i></div>
-        <div class="tick"><b>BACKTEST</b><span>simulated trades</span><i>▲ 850+</i></div>
-      </div>
-    </div>
-  </div>
-
   <div class="figures">
     <div class="wrap">
-      <div class="figure"><div class="n">5M<small>+</small></div><p>policyholders covered by the churn model I took to production at Allstate</p></div>
-      <div class="figure"><div class="n">2<small>×</small></div><p>hackathon wins, including first of 87 teams at RowdyHacks</p></div>
-      <div class="figure"><div class="n">2</div><p>NASA-funded balloon missions: Alaska aurora and the Texas solar eclipse</p></div>
-      <div class="figure"><div class="n">3.72</div><p>GPA in Computer Science with a Mathematics minor, Cum Laude</p></div>
+      <div class="figure"><div class="n">5M<small>+</small></div><p>policyholders on my Allstate model</p></div>
+      <div class="figure"><div class="n">2<small>×</small></div><p>hackathon wins</p></div>
+      <div class="figure"><div class="n">2</div><p>NASA-funded missions</p></div>
+      <div class="figure"><div class="n">3.72</div><p>GPA, Cum Laude</p></div>
     </div>
   </div>
 
   <section class="block" id="about">
     <div class="wrap">
-      <div class="label"><span class="mono">About</span><h2>Who I am</h2></div>
+      <div class="label"><h2>About</h2></div>
       <div>
         <div class="prose">
-          <p>I like problems where the answer has to survive contact with real data, and where being honest about noise matters as much as finding signal.</p>
-          <p>I graduated from the University of Houston in May 2026 with a B.S. in Computer Science and a minor in Mathematics. Along the way I interned in data science at Allstate, built generative-AI tooling at Ambit Software, spent two years processing flight data for NASA-funded balloon missions, and won two hackathons.</p>
-          <p>Most of my own work is quantitative trading research. I turn discretionary options playbooks into testable rules, then build what it takes to test them properly: data capture, point-in-time backtesters, risk rules and trade journals.</p>
-          <p>I am now studying sports analytics as a postgraduate at Barça Innovation Hub, and I keep building with large language models: structured outputs, LLM-as-judge checks and guardrails that keep a human in the loop.</p>
+          <p>CS graduate from the University of Houston, now studying sports analytics at Barça Innovation Hub and building my own trading research stack.</p>
         </div>
         <div class="focus">
           <div>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-6 4 3 4-8 5 4"/><path d="M3 21h18"/></svg>
-            <h3>Quant research</h3><p>Options strategies, point-in-time backtesting, execution modeling and risk.</p>
+            <h3>Quant research</h3><p>Options strategies and honest backtests.</p>
           </div>
           <div>
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><path d="M7 6.8l3.2 3.8M7 17.2l3.2-3.8M14 12h3"/></svg>
-            <h3>Machine learning</h3><p>Ensemble models, SHAP interpretability, computer vision and reinforcement learning.</p>
+            <h3>Machine learning</h3><p>Models that ship and can be explained.</p>
           </div>
           <div>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/><path d="M19 17v4M17 19h4"/></svg>
-            <h3>AI tooling</h3><p>Multi-agent systems, structured outputs, LLM-as-judge and human-in-the-loop guardrails.</p>
+            <h3>AI tooling</h3><p>Agents with a human in the loop.</p>
           </div>
         </div>
       </div>
@@ -418,137 +413,144 @@ footer .wrap { padding-block: 26px; display: flex; justify-content: space-betwee
 
   <section class="block" id="experience">
     <div class="wrap">
-      <div class="label"><span class="mono">Experience</span><h2>Where I've worked</h2></div>
+      <div class="label"><h2>Experience</h2></div>
       <div class="roles">
-        <article class="role">
-          <div class="role-head"><h3>Data Science Intern</h3><time>Jun 2024 – Aug 2024</time></div>
-          <div class="org">Allstate Insurance</div>
-          <div class="quotes">
-            <span class="quote">AUC 0.84<span>churn model</span></span>
-            <span class="quote">▲ 12%<span>prediction precision</span></span>
-            <span class="quote">▼ 40%<span>experiment time</span></span>
-            <span class="quote">5M+<span>policyholders</span></span>
-          </div>
+        <details class="role">
+          <summary>
+            <div class="role-head"><h3>Data Science Intern <span class="org">· Allstate</span></h3><time>Summer 2024</time></div>
+            <div class="quotes">
+              <span class="quote">AUC 0.84<span>churn model in production</span></span>
+              <span class="quote">▲ 12%<span>precision</span></span>
+              <span class="quote">▼ 40%<span>experiment time</span></span>
+            </div>
+            <span class="hint mono"></span>
+          </summary>
           <ul>
-            <li>Delivered a customer-churn proof of concept that was accepted and taken to production: an ensemble model with calibrated probabilities giving retention teams early warning.</li>
+            <li>Delivered a customer-churn proof of concept that was accepted and taken to production, giving retention teams early warning across 5M+ policyholders.</li>
             <li>Used SHAP interpretability to explain in business terms why customers were flagged, then turned those findings into validated behavioral features.</li>
             <li>Automated the training and evaluation pipeline to remove the iteration bottleneck.</li>
           </ul>
-        </article>
-        <article class="role">
-          <div class="role-head"><h3>Gen AI Intern</h3><time>Jun 2023 – Aug 2023</time></div>
-          <div class="org">Ambit Software, India</div>
+        </details>
+        <details class="role">
+          <summary>
+            <div class="role-head"><h3>Undergraduate Researcher <span class="org">· University of Houston &amp; NASA</span></h3><time>2022 – 2024</time></div>
+            <div class="quotes">
+              <span class="quote">2<span>balloon missions</span></span>
+              <span class="quote">75K+<span>datapoints per flight</span></span>
+            </div>
+            <span class="hint mono"></span>
+          </summary>
+          <ul>
+            <li>Ran the processing pipeline for the microplastics, radio and other payload teams, turning raw telemetry into analysis-ready datasets.</li>
+            <li>Selected for NASA-funded balloon missions: the 2023 Alaska aurora campaign and the 2024 Texas solar eclipse.</li>
+            <li>Built Python and MATLAB pipelines with version-controlled workflows so results stayed reproducible.</li>
+          </ul>
+        </details>
+        <details class="role">
+          <summary>
+            <div class="role-head"><h3>Gen AI Intern <span class="org">· Ambit Software</span></h3><time>Summer 2023</time></div>
+            <div class="quotes">
+              <span class="quote plain">Generative AI in client CRMs</span>
+              <span class="quote plain">Power Platform automation</span>
+            </div>
+            <span class="hint mono"></span>
+          </summary>
           <ul>
             <li>Built and integrated a generative-AI tool into client CRM platforms, taking repetitive workflow steps off enterprise users.</li>
-            <li>Replaced a manual support-intake process with a customer ticketing portal on PowerApps with a custom HTML/CSS front end.</li>
-            <li>Turned recurring manual data pulls into a scheduled Power Automate and Power BI pipeline for client feedback reporting.</li>
+            <li>Replaced a manual support-intake process with a customer ticketing portal on PowerApps.</li>
+            <li>Turned recurring manual data pulls into a scheduled Power Automate and Power BI pipeline.</li>
           </ul>
-        </article>
-        <article class="role">
-          <div class="role-head"><h3>Undergraduate Researcher, USIP</h3><time>Aug 2022 – Aug 2024</time></div>
-          <div class="org">University of Houston &amp; NASA</div>
-          <div class="quotes">
-            <span class="quote">75K+<span>datapoints per flight</span></span>
-            <span class="quote">2<span>balloon missions</span></span>
-          </div>
-          <ul>
-            <li>Ran the processing pipeline for the microplastics, radio and other payload teams, turning raw telemetry into analysis-ready datasets each team could use directly.</li>
-            <li>Selected for NASA-funded balloon missions: the 2023 Alaska aurora campaign and the 2024 Texas solar eclipse. Built Python and MATLAB pipelines with version-controlled workflows so results stayed reproducible.</li>
-          </ul>
-        </article>
+        </details>
       </div>
     </div>
   </section>
 
   <section class="block" id="projects">
     <div class="wrap">
-      <div class="label"><span class="mono">Projects</span><h2>What I've built</h2></div>
+      <div class="label"><h2>Projects</h2></div>
       <div>
         <div class="cards">
           <a class="card feature" href="https://devpost.com/software/sign_interpreter_app" target="_blank" rel="noopener">
             <div class="card-top"><span class="badge">★ Best Overall App · RowdyHacks 2024</span><span class="arrow">↗</span></div>
             <h3>Real-Time Sign Language Interpreter</h3>
-            <p>A live ASL-to-text translator built from scratch in 24 hours. A custom gesture model trained on 5K+ labeled images, behind a web interface anyone can use. It placed first among 87 teams and 550+ participants.</p>
+            <p>Live ASL-to-text translation, built from scratch in 24 hours.</p>
             <p class="stat"><b>92%</b> accuracy · <b>&lt;50 ms</b> inference · <b>1st of 87</b> teams</p>
-            <div class="tags"><span>Python</span><span>React</span><span>YOLOv8</span><span>OpenCV</span></div>
           </a>
           <a class="card" href="https://github.com/anishdokania/Personal-Sean" target="_blank" rel="noopener">
-            <div class="card-top"><span class="mono">Quant research</span><span class="arrow">↗</span></div>
-            <h3>Options Swing-Trading Signal &amp; Backtesting Engine</h3>
-            <p>A daily signal pipeline with liquidity gates, sector-momentum ranking and setup scoring, plus an event-driven, point-in-time backtester that reuses the live scoring code. A sector filter lifted expectancy to +0.07R; at t ≈ 0.7 I called it noise, not edge.</p>
-            <p class="stat"><b>5,100+</b> equities daily · <b>850+</b> simulated trades</p>
-            <div class="tags"><span>Python</span><span>pandas</span><span>NumPy</span><span>GitHub Actions</span><span>Anthropic API</span></div>
+            <div class="card-top"><span class="mono">Python · pandas</span><span class="arrow">↗</span></div>
+            <h3>Options Signal &amp; Backtesting Engine</h3>
+            <p>Daily trade signals with a point-in-time backtester.</p>
+            <p class="stat"><b>5,100+</b> equities · <b>850+</b> simulated trades</p>
           </a>
           <a class="card" href="https://github.com/anishdokania/Personal-xAI-Distributor-Manager-Operator" target="_blank" rel="noopener">
-            <div class="card-top"><span class="mono">AI agents</span><span class="arrow">↗</span></div>
+            <div class="card-top"><span class="mono">TypeScript · Next.js</span><span class="arrow">↗</span></div>
             <h3>Governed Multi-Agent Content Operator</h3>
-            <p>Scoring, drafting and posting agents that rate every inbound item for relevance and risk. Pattern screening and an LLM risk pass sit behind draft-first defaults, so a human approves before anything goes out.</p>
-            <p class="stat"><b>2</b> independent controls · full SQLite audit trail</p>
-            <div class="tags"><span>TypeScript</span><span>Next.js</span><span>OpenAI API</span><span>Playwright</span></div>
+            <p>AI agents that draft, with a human approving every post.</p>
+            <p class="stat"><b>2</b> risk controls · full audit trail</p>
           </a>
           <a class="card" href="https://github.com/anishdokania/my_gem" target="_blank" rel="noopener">
-            <div class="card-top"><span class="mono">Market data</span><span class="arrow">↗</span></div>
+            <div class="card-top"><span class="mono">Python · Alpaca</span><span class="arrow">↗</span></div>
             <h3>Options Strategy Research Monorepo</h3>
-            <p>A research workspace for intraday and swing options strategies. A hybrid recorder pairs a live WebSocket feed with a REST sweeper, feeding a library of strategies that each pass a written validation checklist.</p>
-            <p class="stat"><b>0–7 DTE</b> full chain coverage · <b>6</b> strategy lines</p>
-            <div class="tags"><span>Python</span><span>Alpaca</span><span>WebSocket</span><span>Docker</span></div>
+            <p>Live market-data capture feeding a library of strategies.</p>
+            <p class="stat"><b>0–7 DTE</b> chain coverage · <b>6</b> strategies</p>
           </a>
           <a class="card" href="https://github.com/anishdokania/starship-rapid-reuse-rl" target="_blank" rel="noopener">
-            <div class="card-top"><span class="mono">Reinforcement learning</span><span class="arrow">↗</span></div>
+            <div class="card-top"><span class="mono">Python · Gymnasium</span><span class="arrow">↗</span></div>
             <h3>Starship Rapid Reuse RL</h3>
-            <p>An educational sandbox for powered-landing control. A simplified 6-DOF environment with wind, sensor noise and engine-out scenarios, where a hand-tuned PID controller is compared against PPO trained with a staged curriculum.</p>
-            <p class="stat"><b>6-DOF</b> environment · <b>PID vs PPO</b></p>
-            <div class="tags"><span>Python</span><span>Gymnasium</span><span>Stable-Baselines3</span></div>
+            <p>Teaching a rocket to land with reinforcement learning.</p>
+            <p class="stat"><b>6-DOF</b> simulation · <b>PID vs PPO</b></p>
           </a>
         </div>
-        <div class="more">
-          <h4 class="mono">More builds</h4>
-          <a href="https://github.com/anishdokania/Engine" target="_blank" rel="noopener"><b>VWAP Reclaim Trading Engine</b><span>Backtesting and paper trading for a VWAP-reclaim options strategy, with a FastAPI trade-journal viewer.</span><i>↗</i></a>
-          <a href="https://devpost.com/software/the-push-battle" target="_blank" rel="noopener"><b>The Push Battle</b><span>A board-game agent combining Q-learning, minimax and Monte Carlo search.</span><i>↗</i></a>
-          <a href="https://devpost.com/software/market-analysis-s-p-500-on-news-sentiments" target="_blank" rel="noopener"><b>Stock Market Sentiment Analysis</b><span>Technical market data combined with real-time news sentiment to predict stock trends.</span><i>↗</i></a>
+        <details class="more">
+          <summary class="mono">4 more builds <span class="hint"></span></summary>
+          <a href="https://github.com/anishdokania/Engine" target="_blank" rel="noopener"><b>VWAP Reclaim Trading Engine</b><span>Backtesting and paper trading for an options strategy.</span><i>↗</i></a>
+          <a href="https://devpost.com/software/the-push-battle" target="_blank" rel="noopener"><b>The Push Battle</b><span>A board-game agent using Q-learning and minimax.</span><i>↗</i></a>
+          <a href="https://devpost.com/software/market-analysis-s-p-500-on-news-sentiments" target="_blank" rel="noopener"><b>Stock Market Sentiment Analysis</b><span>News sentiment plus market data to predict trends.</span><i>↗</i></a>
           <a href="https://devpost.com/software/visi-code" target="_blank" rel="noopener"><b>Visi Code</b><span>Turns a visual idea into working code.</span><i>↗</i></a>
-        </div>
+        </details>
       </div>
     </div>
   </section>
 
   <section class="block" id="awards">
     <div class="wrap">
-      <div class="label"><span class="mono">Awards</span><h2>Recognition</h2></div>
+      <div class="label"><h2>Awards</h2></div>
       <div class="awards">
-        <div class="award gold"><div class="place">1<sup>st</sup></div><span class="mono">RowdyHacks · Feb 2024</span><h3>Best Overall App</h3><p>First among 87 teams and 550+ participants, built from scratch in 24 hours.</p></div>
-        <div class="award"><div class="place">3<sup>rd</sup></div><span class="mono">UH Ideathon · Mar 2024</span><h3>Best College Campus Solution</h3><p>One of 6 finalists chosen from 56 teams and 200+ applicants, as Team Bytesters.</p></div>
-        <div class="award"><div class="place">★</div><span class="mono">University of Houston</span><h3>Academic Excellence Scholarship</h3><p>Merit scholarship, alongside a place on the Dean's List.</p></div>
+        <div class="award gold"><div class="place">1<sup>st</sup></div><span class="mono">RowdyHacks 2024</span><h3>Best Overall App</h3><p>Out of 87 teams.</p></div>
+        <div class="award"><div class="place">3<sup>rd</sup></div><span class="mono">UH Ideathon 2024</span><h3>Best College Campus Solution</h3><p>Out of 56 teams.</p></div>
+        <div class="award"><div class="place">★</div><span class="mono">University of Houston</span><h3>Academic Excellence Scholarship</h3><p>Merit scholarship.</p></div>
       </div>
     </div>
   </section>
 
-  <section class="block" id="education">
+  <section class="block" id="skills">
     <div class="wrap">
-      <div class="label"><span class="mono">Education</span><h2>Where I studied</h2></div>
-      <div class="edu">
-        <article>
-          <h3>B.S. Computer Science, Minor in Mathematics</h3><time>Aug 2022 – May 2026</time>
-          <p><span class="org">University of Houston</span> · GPA 3.72 / 4.00 · Cum Laude · Dean's List. Coursework included Mathematical Introduction to Options, Probability, Statistics, Linear Algebra, Algorithms and Data Science.</p>
-        </article>
-        <article>
-          <h3>Postgraduate, Sports Analytics</h3><time>Expected May 2027</time>
-          <p><span class="org">Barça Innovation Hub (FC Barcelona)</span> · Remote programme.</p>
-        </article>
+      <div class="label"><h2>Education &amp; skills</h2></div>
+      <div>
+        <div class="edu">
+          <article>
+            <h3>B.S. Computer Science, Minor in Mathematics</h3><time>2022 – 2026</time>
+            <p><span class="org">University of Houston</span> · GPA 3.72 · Cum Laude · Dean's List</p>
+          </article>
+          <article>
+            <h3>Postgraduate, Sports Analytics</h3><time>Expected 2027</time>
+            <p><span class="org">Barça Innovation Hub (FC Barcelona)</span></p>
+          </article>
+        </div>
+        <div class="core">
+          <span>Python</span><span>SQL</span><span>C++</span><span>TypeScript</span><span>pandas</span><span>scikit-learn</span><span>PyTorch</span><span>Claude &amp; OpenAI APIs</span><span>FastAPI</span><span>React</span>
+        </div>
+        <details class="full">
+          <summary class="mono">Full toolkit <span class="hint"></span></summary>
+          <dl class="toolkit">
+            <div><dt>Quant &amp; statistics</dt><dd><span>Probability</span><span>Statistical inference</span><span>Time-series analysis</span><span>Point-in-time backtesting</span><span>Options pricing &amp; Greeks</span><span>Position sizing &amp; risk</span></dd></div>
+            <div><dt>AI / LLM</dt><dd><span>Anthropic (Claude) API</span><span>OpenAI API</span><span>Structured outputs</span><span>Tool use</span><span>MCP</span><span>RAG</span><span>LLM-as-judge</span><span>Evals &amp; guardrails</span></dd></div>
+            <div><dt>Data &amp; ML</dt><dd><span>pandas</span><span>NumPy</span><span>scikit-learn</span><span>SHAP</span><span>PyTorch</span><span>OpenCV</span><span>YOLOv8</span></dd></div>
+            <div><dt>Engineering</dt><dd><span>Python</span><span>C++</span><span>SQL</span><span>TypeScript</span><span>JavaScript</span><span>FastAPI</span><span>Next.js</span><span>React</span><span>Node.js</span><span>PostgreSQL</span><span>GitHub Actions</span></dd></div>
+            <div><dt>Automation</dt><dd><span>Power Automate</span><span>PowerApps</span><span>Power BI</span></dd></div>
+          </dl>
+        </details>
       </div>
-    </div>
-  </section>
-
-  <section class="block" id="toolkit">
-    <div class="wrap">
-      <div class="label"><span class="mono">Toolkit</span><h2>What I work with</h2></div>
-      <dl class="toolkit">
-        <div><dt>Quant &amp; statistics</dt><dd><span>Probability</span><span>Statistical inference</span><span>Time-series analysis</span><span>Point-in-time backtesting</span><span>Options pricing &amp; Greeks</span><span>Position sizing &amp; risk</span></dd></div>
-        <div><dt>AI / LLM</dt><dd><span>Anthropic (Claude) API</span><span>OpenAI API</span><span>Structured outputs</span><span>Tool use</span><span>MCP</span><span>RAG</span><span>LLM-as-judge</span><span>Evals &amp; guardrails</span></dd></div>
-        <div><dt>Data &amp; ML</dt><dd><span>pandas</span><span>NumPy</span><span>scikit-learn</span><span>SHAP</span><span>PyTorch</span><span>OpenCV</span><span>YOLOv8</span></dd></div>
-        <div><dt>Engineering</dt><dd><span>Python</span><span>C++</span><span>SQL</span><span>TypeScript</span><span>JavaScript</span><span>FastAPI</span><span>Next.js</span><span>React</span><span>Node.js</span><span>PostgreSQL</span><span>GitHub Actions</span></dd></div>
-        <div><dt>Automation</dt><dd><span>Power Automate</span><span>PowerApps</span><span>Power BI</span></dd></div>
-      </dl>
     </div>
   </section>
 
