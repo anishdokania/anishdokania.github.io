@@ -113,7 +113,23 @@ h1 em { font-style: normal; display: block; color: transparent; -webkit-text-str
 .chart-head, .chart-foot { display: flex; justify-content: space-between; gap: 12px; }
 .chart-head .sym { color: var(--fg); font-weight: 700; }
 .chart canvas { display: block; width: 100%; aspect-ratio: 16 / 10; margin-block: 10px 8px; cursor: crosshair; touch-action: pan-y; }
-#readout { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.track svg { display: block; width: 100%; height: auto; margin-block: 10px 6px; overflow: visible; }
+.track .dot { cursor: pointer; outline: none; }
+.track .dot circle.pt { fill: var(--bg); stroke: var(--up); stroke-width: 2.5; transition: r .2s, fill .2s, stroke .2s; }
+.track .dot:hover circle.pt, .track .dot:focus-visible circle.pt { stroke: var(--accent); r: 7.5; }
+.track .dot.on circle.pt { fill: var(--accent); stroke: var(--accent); r: 8; }
+.track .dot circle.halo { fill: var(--accent); opacity: 0; transition: opacity .2s; }
+.track .dot.on circle.halo { opacity: .22; }
+.track .dot text { font: 500 10px var(--mono); fill: var(--muted); text-anchor: middle; letter-spacing: .04em; }
+.track .dot.on text { fill: var(--fg); }
+.tk-detail { border-top: 1px solid var(--line); padding-top: 16px; min-height: 9.6em; }
+.tk-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.tk-meta .mono { color: var(--accent); }
+.tk-detail h3 { font: 700 1.3rem/1.2 var(--display); letter-spacing: -.02em; margin: 0 0 6px; text-wrap: balance; }
+.tk-detail p { margin: 0; color: var(--muted); font-size: .95rem; line-height: 1.5; }
+.tk-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; }
+.tk-nav button { font: 500 1rem var(--mono); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; width: 44px; height: 36px; cursor: pointer; transition: border-color .15s, color .15s; }
+.tk-nav button:hover { border-color: var(--accent); color: var(--accent); }
 
 /* Ticker tape */
 .tape { border-block: 1px solid var(--line); background: var(--surface); overflow: hidden; }
@@ -272,7 +288,6 @@ footer .wrap { padding-block: 26px; display: flex; justify-content: space-betwee
   nav { gap: 14px; } nav a { font-size: .86rem; } nav a.opt2 { display: none; }
   .figure { padding-inline: 18px; }
   .card, .card.feature, .award { padding: 20px; }
-  #readout { display: none; }
 }
 </style>
 </head>
@@ -308,16 +323,32 @@ footer .wrap { padding-block: 26px; display: flex; justify-content: space-betwee
           <a class="btn" href="https://github.com/anishdokania" target="_blank" rel="noopener">GitHub ↗</a>
         </div>
       </div>
-      <figure class="chart rise d2" aria-label="Illustrative intraday chart of a price dipping below its VWAP line and reclaiming it. Move across it to read values.">
+      <figure class="chart track rise d2" aria-label="My career so far as a chart. Each point is a milestone you can select.">
         <div class="chart-head">
-          <span class="mono"><span class="sym">Session</span> · 1-min bars</span>
-          <span class="mono" id="readout"><span class="up">Price</span> · <span class="amber">VWAP</span></span>
+          <span class="mono"><span class="sym">ANISH</span> · career to date</span>
+          <span class="mono"><span class="up">▲</span> <span id="tk-count">8 milestones</span></span>
         </div>
-        <canvas id="chart" width="960" height="600"></canvas>
-        <div class="chart-foot">
-          <span class="mono">09:30</span>
-          <span class="mono">Simulated data</span>
-          <span class="mono">16:00</span>
+        <svg id="tk" viewBox="0 0 480 232" role="group" aria-label="Milestones in order">
+          <defs>
+            <linearGradient id="tk-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#4fd1b0" stop-opacity=".28"/><stop offset="1" stop-color="#4fd1b0" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <g id="tk-grid"></g>
+          <path id="tk-area" fill="url(#tk-fill)" stroke="none"/>
+          <path id="tk-line" fill="none" stroke="#4fd1b0" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+          <line id="tk-guide" y1="8" y2="222" stroke="#f2b248" stroke-width="1.5" stroke-dasharray="3 5"/>
+          <g id="tk-dots"></g>
+        </svg>
+        <div class="tk-detail" aria-live="polite">
+          <div class="tk-meta"><span class="mono" id="tk-date">Jun 2024</span><span class="quote" id="tk-stat">AUC 0.84 · 5M+ policyholders</span></div>
+          <h3 id="tk-title">Shipped a churn model to production at Allstate</h3>
+          <p id="tk-text">Data Science Intern. My proof of concept was accepted and taken through to production for retention teams.</p>
+        </div>
+        <div class="tk-nav">
+          <button type="button" id="tk-prev" aria-label="Previous milestone">←</button>
+          <span class="mono" id="tk-pos">6 / 8</span>
+          <button type="button" id="tk-next" aria-label="Next milestone">→</button>
         </div>
       </figure>
     </div>
@@ -569,89 +600,59 @@ document.querySelectorAll('.card').forEach(function (c) {
   });
 });
 
-// Hero chart: a simulated session where price dips under VWAP and reclaims it.
+// Hero: my career as a chart. Each point is a real milestone, in order.
 (function () {
-  var c = document.getElementById('chart'), ctx = c.getContext('2d'), out = document.getElementById('readout');
-  var rest = out.innerHTML;
-  var css = getComputedStyle(document.documentElement);
-  var col = function (n) { return css.getPropertyValue(n).trim(); };
-  var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647 - .5; }
-
-  var N = 390, price = [], vwap = [], p = 100, pv = 0, vol = 0, i;
-  for (i = 0; i < N; i++) {
-    var t = i / N;
-    var drift = t < .12 ? .05 : t < .34 ? -.07 : t < .5 ? .09 : .028;
-    p += drift + rnd() * .34;
-    var v = 1 + Math.abs(rnd()) * 2 + (t < .1 || t > .9 ? 2 : 0);
-    pv += p * v; vol += v;
-    price.push(p); vwap.push(pv / vol);
+  var M = [
+    { d: 'Aug 2022', t: '’22', h: 0,   title: 'Started Computer Science at the University of Houston', text: 'Joined the NASA-funded Undergraduate Student Instrumentation Project in my first semester.', stat: 'NASA-funded research' },
+    { d: 'Jun 2023', t: '’23', h: 1,   title: 'Built generative-AI tooling at Ambit Software', text: 'Gen AI Intern. Integrated a generative-AI tool into client CRM platforms and automated support intake and reporting.', stat: 'Gen AI · enterprise CRM' },
+    { d: 'Feb 2024', t: 'Feb', h: 2.5, title: 'Won Best Overall App at RowdyHacks', text: 'A real-time sign language interpreter, built from scratch in 24 hours. 92% accuracy at under 50 ms.', stat: '1st of 87 teams' },
+    { d: 'Mar 2024', t: 'Mar', h: 3.3, title: 'Best College Campus Solution at UH Ideathon', text: 'One of 6 finalists chosen from 56 teams and 200+ applicants, then placed 3rd in the final.', stat: '3rd of 56 teams' },
+    { d: 'Apr 2024', t: 'Apr', h: 4.1, title: 'Flew my second NASA-funded balloon mission', text: 'The Texas solar eclipse flight, after the 2023 Alaska aurora campaign. I ran the data pipeline for the payload teams.', stat: '75K+ datapoints per flight' },
+    { d: 'Jun 2024', t: 'Jun', h: 5.6, title: 'Shipped a churn model to production at Allstate', text: 'Data Science Intern. My proof of concept was accepted and taken through to production for retention teams.', stat: 'AUC 0.84 · 5M+ policyholders' },
+    { d: 'May 2026', t: '’26', h: 6.6, title: 'Graduated Cum Laude from the University of Houston', text: 'B.S. Computer Science with a minor in Mathematics, on the Dean’s List with a merit scholarship.', stat: 'GPA 3.72' },
+    { d: 'Now',      t: 'Now', h: 7.4, title: 'Studying sports analytics at Barça Innovation Hub', text: 'Postgraduate programme with FC Barcelona’s innovation arm, while building my own AI-native trading research stack.', stat: 'FC Barcelona' }
+  ];
+  var NS = 'http://www.w3.org/2000/svg', el = function (id) { return document.getElementById(id); };
+  var X = function (i) { return 28 + i * (424 / (M.length - 1)); };
+  var Y = function (h) { return 190 - h * 22; };
+  var d = '', k, g;
+  for (k = 0; k < M.length; k++) d += (k ? ' L' : 'M') + X(k) + ' ' + Y(M[k].h);
+  el('tk-line').setAttribute('d', d);
+  el('tk-area').setAttribute('d', d + ' L' + X(M.length - 1) + ' 208 L' + X(0) + ' 208 Z');
+  for (k = 0; k < 4; k++) {
+    g = document.createElementNS(NS, 'line');
+    g.setAttribute('x1', 0); g.setAttribute('x2', 480); g.setAttribute('y1', 28 + k * 54); g.setAttribute('y2', 28 + k * 54);
+    g.setAttribute('stroke', '#212a45'); g.setAttribute('stroke-width', 1); el('tk-grid').appendChild(g);
   }
-  var reclaim = -1;
-  for (i = 60; i < N; i++) if (price[i - 1] < vwap[i - 1] && price[i] >= vwap[i] && price[i - 20] < vwap[i - 20]) { reclaim = i; break; }
-
-  var lo = Math.min.apply(null, price), hi = Math.max.apply(null, price);
-  var W = c.width, H = c.height, padX = 8, padY = 30, shown = N, hover = -1;
-  var X = function (i) { return padX + i / (N - 1) * (W - padX * 2); };
-  var Y = function (v) { return H - padY - (v - lo) / (hi - lo) * (H - padY * 2); };
-  var clock = function (i) { var m = 570 + i; return ('0' + Math.floor(m / 60)).slice(-2) + ':' + ('0' + m % 60).slice(-2); };
-
-  function draw() {
-    var n = shown, k;
-    ctx.clearRect(0, 0, W, H);
-    ctx.strokeStyle = col('--line'); ctx.lineWidth = 1; ctx.setLineDash([]);
-    for (var g = 0; g <= 4; g++) { var y = padY + g * (H - padY * 2) / 4; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
-
-    var grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, 'rgba(79,209,176,.26)'); grad.addColorStop(1, 'rgba(79,209,176,0)');
-    ctx.beginPath(); ctx.moveTo(X(0), H);
-    for (k = 0; k < n; k++) ctx.lineTo(X(k), Y(price[k]));
-    ctx.lineTo(X(n - 1), H); ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
-
-    ctx.lineJoin = 'round';
-    ctx.beginPath(); for (k = 0; k < n; k++) ctx[k ? 'lineTo' : 'moveTo'](X(k), Y(vwap[k]));
-    ctx.strokeStyle = col('--accent'); ctx.lineWidth = 3; ctx.setLineDash([10, 8]); ctx.stroke(); ctx.setLineDash([]);
-
-    ctx.beginPath(); for (k = 0; k < n; k++) ctx[k ? 'lineTo' : 'moveTo'](X(k), Y(price[k]));
-    ctx.strokeStyle = col('--up'); ctx.lineWidth = 3.5; ctx.shadowColor = 'rgba(79,209,176,.6)'; ctx.shadowBlur = 16; ctx.stroke(); ctx.shadowBlur = 0;
-
-    if (reclaim > 0 && n > reclaim) {
-      var rx = X(reclaim), ry = Y(price[reclaim]);
-      ctx.beginPath(); ctx.arc(rx, ry, 9, 0, Math.PI * 2); ctx.fillStyle = col('--bg'); ctx.fill();
-      ctx.lineWidth = 3.5; ctx.strokeStyle = col('--accent'); ctx.stroke();
-      ctx.font = '500 22px "JetBrains Mono", monospace'; ctx.fillStyle = col('--fg'); ctx.textAlign = 'left';
-      ctx.fillText('VWAP RECLAIM', rx + 18, ry + 36);
-    }
-    if (hover >= 0 && hover < n) {
-      var hx = X(hover);
-      ctx.strokeStyle = col('--muted'); ctx.lineWidth = 1.5; ctx.setLineDash([4, 6]);
-      ctx.beginPath(); ctx.moveTo(hx, 0); ctx.lineTo(hx, H); ctx.stroke(); ctx.setLineDash([]);
-      ctx.beginPath(); ctx.arc(hx, Y(vwap[hover]), 6, 0, Math.PI * 2); ctx.fillStyle = col('--accent'); ctx.fill();
-      ctx.beginPath(); ctx.arc(hx, Y(price[hover]), 7, 0, Math.PI * 2); ctx.fillStyle = col('--up'); ctx.fill();
-    } else {
-      ctx.beginPath(); ctx.arc(X(n - 1), Y(price[n - 1]), 6, 0, Math.PI * 2); ctx.fillStyle = col('--up'); ctx.fill();
-    }
-  }
-
-  c.addEventListener('pointermove', function (e) {
-    var r = c.getBoundingClientRect();
-    hover = Math.max(0, Math.min(N - 1, Math.round((e.clientX - r.left) / r.width * (N - 1))));
-    var d = price[hover] - vwap[hover];
-    out.innerHTML = clock(hover) + ' · <span class="up">' + price[hover].toFixed(2) + '</span> · <span class="amber">' + vwap[hover].toFixed(2) + '</span> · ' + (d >= 0 ? '+' : '−') + Math.abs(d).toFixed(2);
-    draw();
+  var dots = M.map(function (m, i) {
+    var n = document.createElementNS(NS, 'g');
+    n.setAttribute('class', 'dot'); n.setAttribute('tabindex', '0'); n.setAttribute('role', 'button');
+    n.setAttribute('aria-label', m.d + ': ' + m.title);
+    n.innerHTML = '<circle cx="' + X(i) + '" cy="' + Y(m.h) + '" r="22" fill="transparent"/>' +
+      '<circle class="halo" cx="' + X(i) + '" cy="' + Y(m.h) + '" r="16"/>' +
+      '<circle class="pt" cx="' + X(i) + '" cy="' + Y(m.h) + '" r="6"/>' +
+      '<text x="' + X(i) + '" y="226">' + m.t + '</text>';
+    n.addEventListener('click', function () { stop(); show(i); });
+    n.addEventListener('mouseenter', function () { stop(); show(i); });
+    n.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); stop(); show(i); } });
+    el('tk-dots').appendChild(n);
+    return n;
   });
-  c.addEventListener('pointerleave', function () { hover = -1; out.innerHTML = rest; draw(); });
-
-  draw(); // complete at rest
-  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    var start = null;
-    requestAnimationFrame(function step(ts) {
-      if (!start) start = ts;
-      shown = Math.min(N, Math.max(2, Math.round((ts - start) / 1800 * N)));
-      draw();
-      if (shown < N) requestAnimationFrame(step);
-    });
+  var cur = 5, timer = null;
+  function show(i) {
+    cur = (i + M.length) % M.length;
+    var m = M[cur];
+    dots.forEach(function (n, j) { n.classList.toggle('on', j === cur); });
+    el('tk-guide').setAttribute('x1', X(cur)); el('tk-guide').setAttribute('x2', X(cur));
+    el('tk-date').textContent = m.d; el('tk-stat').textContent = m.stat;
+    el('tk-title').textContent = m.title; el('tk-text').textContent = m.text;
+    el('tk-pos').textContent = (cur + 1) + ' / ' + M.length;
   }
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+  el('tk-prev').addEventListener('click', function () { stop(); show(cur - 1); });
+  el('tk-next').addEventListener('click', function () { stop(); show(cur + 1); });
+  show(cur);
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) timer = setInterval(function () { show(cur + 1); }, 3800);
 })();
 </script>
 </body>
