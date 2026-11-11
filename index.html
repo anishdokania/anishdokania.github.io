@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anish Dokania</title>
+<meta name="description" content="Anish Dokania: computer science graduate building quantitative trading research systems, machine learning models and AI tooling. Houston, TX.">
+<meta property="og:title" content="Anish Dokania">
+<meta property="og:description" content="Markets, machine learning and AI tooling. Houston, TX.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://anishdokania.github.io">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout: one narrow column of sections under a split hero whose right half is a live-drawn session chart (price vs. VWAP). */
+:root {
+  color-scheme: dark;
+  --bg: #0a0e1a;          /* deep ink navy */
+  --surface: #111729;
+  --surface-2: #161d33;
+  --line: #232c47;
+  --fg: #e8ecf6;
+  --muted: #8f9ab8;
+  --accent: #f2b248;      /* amber: the VWAP line */
+  --up: #4fd1b0;          /* teal: price above VWAP */
+  --down: #ef7a85;
+  --display: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --wrap: 1080px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 400 1rem/1.65 var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.wrap {
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+.mono { font-family: var(--mono); font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
+/* Header */
+header.site {
+  position: sticky; top: 0; z-index: 5;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+header.site .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; }
+.brand { font: 600 1.05rem var(--display); text-decoration: none; letter-spacing: -.01em; }
+.brand span { color: var(--accent); }
+nav { display: flex; gap: 22px; flex-wrap: wrap; }
+nav a { text-decoration: none; color: var(--muted); font-size: .92rem; transition: color .15s; }
+nav a:hover { color: var(--fg); }
+
+/* Hero */
+.hero .wrap {
+  display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 48px; align-items: center;
+  padding-block: 84px 72px;
+}
+h1 {
+  font: 700 clamp(2.6rem, 6.4vw, 4.6rem)/1.02 var(--display);
+  letter-spacing: -.035em; margin: 14px 0 20px; text-wrap: balance;
+}
+.lede { font-size: 1.14rem; color: var(--muted); max-width: 34em; margin: 0 0 30px; }
+.lede strong { color: var(--fg); font-weight: 500; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 18px; border-radius: 8px; text-decoration: none;
+  font: 500 .95rem var(--body); border: 1px solid var(--line);
+  transition: transform .15s, border-color .15s, background .15s;
+}
+.btn:hover { transform: translateY(-1px); border-color: var(--muted); }
+.btn.primary { background: var(--accent); color: #1a1204; border-color: var(--accent); font-weight: 600; }
+.btn.primary:hover { background: #f7c467; border-color: #f7c467; }
+
+.chart {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 16px 16px 12px; min-width: 0;
+}
+.chart-head, .chart-foot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.chart canvas { display: block; width: 100%; aspect-ratio: 16 / 10; margin-block: 10px 8px; }
+.legend { display: flex; gap: 16px; }
+.legend i { display: inline-block; width: 14px; height: 2px; vertical-align: middle; margin-right: 6px; }
+.legend .p i { background: var(--up); }
+.legend .v i { background: var(--accent); }
+
+/* Sections */
+section.block { border-top: 1px solid var(--line); }
+section.block .wrap { padding-block: 72px; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; }
+h2 { font: 600 1.05rem var(--display); margin: 0; color: var(--fg); letter-spacing: -.01em; }
+h2 small { display: block; margin-top: 6px; font-weight: 400; }
+.prose p { margin: 0 0 1.1em; max-width: 62ch; color: #c5cce0; }
+.prose p:last-child { margin-bottom: 0; }
+
+.focus { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-top: 36px; }
+.focus h3 { font: 600 1rem var(--display); margin: 0 0 6px; }
+.focus p { margin: 0; color: var(--muted); font-size: .95rem; }
+.focus div { border-top: 2px solid var(--line); padding-top: 14px; }
+.focus div:first-child { border-top-color: var(--accent); }
+
+/* Projects */
+.projects { display: grid; gap: 0; }
+.project {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 24px;
+  padding: 26px 0; border-bottom: 1px solid var(--line);
+  text-decoration: none; transition: padding .2s;
+}
+.project:first-child { padding-top: 0; }
+.project:last-child { border-bottom: 0; padding-bottom: 0; }
+.project h3 { font: 600 1.3rem/1.25 var(--display); margin: 0; letter-spacing: -.015em; transition: color .15s; }
+.project:hover h3 { color: var(--accent); }
+.project .arrow { color: var(--muted); font-family: var(--mono); transition: transform .2s, color .15s; }
+.project:hover .arrow { transform: translate(3px, -3px); color: var(--accent); }
+.project p { grid-column: 1 / -1; margin: 0; color: var(--muted); max-width: 64ch; }
+.tags { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.tags span {
+  font: 400 .74rem var(--mono); color: #b9c2dc;
+  background: var(--surface-2); border: 1px solid var(--line);
+  padding: 3px 9px; border-radius: 999px;
+}
+
+/* Experience */
+.pending {
+  border: 1px dashed var(--line); border-radius: 12px; padding: 22px 24px;
+  color: var(--muted); background: var(--surface);
+}
+.pending strong { color: var(--fg); font-weight: 500; }
+
+.role { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 24px; padding: 26px 0; border-bottom: 1px solid var(--line); }
+.role:first-child { padding-top: 0; }
+.role:last-child { border-bottom: 0; padding-bottom: 0; }
+.role h3 { font: 600 1.2rem/1.3 var(--display); margin: 0; letter-spacing: -.015em; }
+.role h3 span { color: var(--muted); font-weight: 500; }
+.role time { font: 400 .78rem var(--mono); color: var(--muted); white-space: nowrap; padding-top: 5px; }
+.role ul { grid-column: 1 / -1; margin: 10px 0 0; padding-left: 1.1em; color: #c5cce0; max-width: 68ch; display: grid; gap: 8px; }
+.role ul li::marker { color: var(--accent); }
+.role p { grid-column: 1 / -1; margin: 6px 0 0; color: var(--muted); max-width: 68ch; }
+.num { color: var(--fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.awards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+.awards div { border-top: 2px solid var(--line); padding-top: 14px; }
+.awards div:first-child { border-top-color: var(--accent); }
+.awards .place { font: 700 2rem/1 var(--display); letter-spacing: -.03em; margin-bottom: 10px; }
+.awards div:first-child .place { color: var(--accent); }
+.awards h3 { font: 600 1rem var(--display); margin: 0 0 6px; }
+.awards p { margin: 0; color: var(--muted); font-size: .95rem; }
+
+.toolkit { display: grid; gap: 18px; margin: 0; }
+.toolkit div { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 8px 20px; }
+.toolkit dt { font: 600 .95rem var(--display); }
+.toolkit dd { margin: 0; color: var(--muted); }
+
+.reach { display: grid; gap: 0; margin: 0 0 26px; max-width: 520px; }
+.reach div { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.reach dt { font: 400 .78rem var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-top: 3px; }
+.reach dd { margin: 0; }
+.reach a { text-decoration: none; border-bottom: 1px solid var(--line); transition: border-color .15s, color .15s; }
+.reach a:hover { color: var(--accent); border-color: var(--accent); }
+
+/* Contact */
+.contact h3 { font: 600 clamp(1.6rem, 3.6vw, 2.3rem)/1.15 var(--display); letter-spacing: -.025em; margin: 0 0 14px; text-wrap: balance; }
+.contact p { color: var(--muted); margin: 0 0 24px; max-width: 52ch; }
+
+footer .wrap { padding-block: 28px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--line); }
+
+@media (max-width: 820px) {
+  .hero .wrap { grid-template-columns: minmax(0, 1fr); padding-block: 52px 48px; gap: 36px; }
+  section.block .wrap { grid-template-columns: minmax(0, 1fr); gap: 22px; padding-block: 52px; }
+  .focus, .awards { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .toolkit div { grid-template-columns: minmax(0, 1fr); }
+  .role { grid-template-columns: minmax(0, 1fr); }
+  .role time { padding-top: 0; }
+  nav { gap: 16px; }
+}
+@media (max-width: 480px) { nav { flex-wrap: nowrap; gap: 14px; } nav a { font-size: .86rem; } nav a.opt { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="#top">anish<span>.</span>dokania</a>
+    <nav aria-label="Sections">
+      <a class="opt" href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#experience">Experience</a>
+      <a class="opt" href="#awards">Awards</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <div class="mono">Houston, TX · UH Computer Science ’26 · 2× hackathon winner</div>
+        <h1>Anish Dokania</h1>
+        <p class="lede">I build systems where <strong>markets, machine learning and AI tooling</strong> meet. Data science at Allstate, payload data pipelines for NASA-funded balloon missions, and options-trading research engines of my own.</p>
+        <div class="actions">
+          <a class="btn primary" href="#projects">See my projects</a>
+          <a class="btn" href="https://www.linkedin.com/in/anishdokania/" target="_blank" rel="noopener">LinkedIn ↗</a>
+          <a class="btn" href="https://github.com/anishdokania" target="_blank" rel="noopener">GitHub ↗</a>
+        </div>
+      </div>
+      <figure class="chart" style="margin:0" aria-label="Illustrative intraday chart of a price dipping below its VWAP line and reclaiming it">
+        <div class="chart-head">
+          <span class="mono">Session · 1-min bars</span>
+          <span class="mono legend"><span class="p"><i></i>Price</span><span class="v"><i></i>VWAP</span></span>
+        </div>
+        <canvas id="chart" width="960" height="600"></canvas>
+        <div class="chart-foot">
+          <span class="mono">09:30</span>
+          <span class="mono">Simulated data</span>
+          <span class="mono">16:00</span>
+        </div>
+      </figure>
+    </div>
+  </div>
+
+  <section class="block" id="about">
+    <div class="wrap">
+      <h2>About</h2>
+      <div>
+        <div class="prose">
+          <p>I graduated from the University of Houston in May 2026 with a B.S. in Computer Science and a minor in Mathematics. Along the way I interned in data science at Allstate, built generative-AI tooling at Ambit Software, spent two years processing flight data for NASA-funded balloon missions, and won two hackathons.</p>
+          <p>Most of my own work is quantitative trading research. I turn discretionary options playbooks into testable rules, then build what it takes to test them properly: data capture, point-in-time backtesters, risk rules and trade journals. I would rather call a result noise than call it edge too early.</p>
+          <p>I am now studying sports analytics as a postgraduate at Barça Innovation Hub, and I keep building with large language models: structured outputs, LLM-as-judge checks and guardrails that keep a human in the loop.</p>
+        </div>
+        <div class="focus">
+          <div><h3>Quant research</h3><p>VWAP and opening-range options strategies, backtest methodology, execution modeling.</p></div>
+          <div><h3>Reinforcement learning</h3><p>Custom Gymnasium environments, PPO training, reward shaping, classical baselines.</p></div>
+          <div><h3>AI tooling</h3><p>LLM-assisted chart triage, agent workflows, local-first automation.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="projects">
+    <div class="wrap">
+      <h2>Projects<small class="mono">GitHub and Devpost</small></h2>
+      <div class="projects">
+        <a class="project" href="https://devpost.com/software/sign_interpreter_app" target="_blank" rel="noopener">
+          <h3>Real-Time Sign Language Interpreter</h3><span class="arrow">↗</span>
+          <p>A live ASL-to-text translator built in 24 hours with a small team. A custom gesture model trained on 5K+ labeled images reaches 92% accuracy at under 50 ms per frame, behind a web interface anyone can use. Won Best Overall App at RowdyHacks 2024, placing first among 87 teams and 550+ participants.</p>
+          <div class="tags"><span>Python</span><span>React</span><span>YOLOv8</span><span>RowdyHacks 2024 winner</span></div>
+        </a>
+        <a class="project" href="https://github.com/anishdokania/my_gem" target="_blank" rel="noopener">
+          <h3>Options Strategy Research Monorepo</h3><span class="arrow">↗</span>
+          <p>A research workspace for intraday and swing options strategies on U.S. equities and ETFs. A hybrid recorder pairs a live WebSocket feed with a REST sweeper for full 0–7 DTE chain coverage, feeding a library of strategies that each pass a written validation checklist.</p>
+          <div class="tags"><span>Python</span><span>Alpaca</span><span>Options</span><span>Backtesting</span><span>Docker</span></div>
+        </a>
+        <a class="project" href="https://github.com/anishdokania/Engine" target="_blank" rel="noopener">
+          <h3>VWAP Reclaim Trading Engine</h3><span class="arrow">↗</span>
+          <p>Backtesting and paper trading for a VWAP-reclaim strategy on listed options. Entries are priced from the option tape, with rules-based sizing, risk limits, year-by-year runs and a FastAPI trade-journal viewer.</p>
+          <div class="tags"><span>Python</span><span>Pydantic</span><span>FastAPI</span><span>Paper trading</span></div>
+        </a>
+        <a class="project" href="https://github.com/anishdokania/Personal-Sean" target="_blank" rel="noopener">
+          <h3>Options Swing-Trading Signal &amp; Backtesting Engine</h3><span class="arrow">↗</span>
+          <p>A daily signal pipeline over 5,100+ U.S. equities with liquidity and volatility gates, sector-momentum ranking and setup scoring, paired with an event-driven, point-in-time backtester that reuses the live scoring code. Across 850+ simulated trades a sector filter lifted expectancy from +0.02R to +0.07R; at t ≈ 0.7 I treated that as noise, not edge.</p>
+          <div class="tags"><span>Python</span><span>pandas</span><span>NumPy</span><span>GitHub Actions</span><span>Anthropic API</span></div>
+        </a>
+        <a class="project" href="https://github.com/anishdokania/starship-rapid-reuse-rl" target="_blank" rel="noopener">
+          <h3>Starship Rapid Reuse RL</h3><span class="arrow">↗</span>
+          <p>An educational sandbox for powered-landing control. A simplified 6-DOF environment with wind, sensor noise and engine-out scenarios, where a hand-tuned PID controller is compared against PPO trained with a staged curriculum.</p>
+          <div class="tags"><span>Python</span><span>Gymnasium</span><span>Stable-Baselines3</span><span>PPO</span></div>
+        </a>
+        <a class="project" href="https://github.com/anishdokania/Personal-xAI-Distributor-Manager-Operator" target="_blank" rel="noopener">
+          <h3>Governed Multi-Agent Content Operator</h3><span class="arrow">↗</span>
+          <p>Scoring, drafting and posting agents that rate every inbound item 1–10 for relevance and risk. Two independent controls, pattern screening and an LLM risk pass, sit behind draft-first defaults and rate limits, so a human approves before anything goes out. Every action is logged to SQLite for a full audit trail.</p>
+          <div class="tags"><span>TypeScript</span><span>Next.js</span><span>OpenAI API</span><span>Playwright</span><span>SQLite</span></div>
+        </a>
+        <a class="project" href="https://devpost.com/software/the-push-battle" target="_blank" rel="noopener">
+          <h3>The Push Battle</h3><span class="arrow">↗</span>
+          <p>A game-playing agent for the Push Battle board game that combines Q-learning, minimax and Monte Carlo search to choose adaptive moves. Hackathon build.</p>
+          <div class="tags"><span>Reinforcement learning</span><span>Minimax</span><span>Monte Carlo search</span></div>
+        </a>
+        <a class="project" href="https://devpost.com/software/market-analysis-s-p-500-on-news-sentiments" target="_blank" rel="noopener">
+          <h3>Stock Market Sentiment Analysis</h3><span class="arrow">↗</span>
+          <p>Combines technical market data with real-time news sentiment to predict stock trends. Hackathon build.</p>
+          <div class="tags"><span>Sentiment analysis</span><span>Market data</span></div>
+        </a>
+        <a class="project" href="https://devpost.com/software/visi-code" target="_blank" rel="noopener">
+          <h3>Visi Code</h3><span class="arrow">↗</span>
+          <p>Turns a visual idea into working code. Hackathon build.</p>
+          <div class="tags"><span>Hackathon</span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="experience">
+    <div class="wrap">
+      <h2>Experience</h2>
+      <div>
+        <article class="role">
+          <h3>Data Science Intern <span>· Allstate Insurance</span></h3><time>Jun 2024 – Aug 2024</time>
+          <ul>
+            <li>Delivered a customer-churn proof of concept that was accepted and taken to production: an ensemble model with calibrated probabilities (<span class="num">AUC 0.84</span>) giving retention teams early warning across <span class="num">5M+</span> policyholders.</li>
+            <li>Used SHAP interpretability to explain in business terms why customers were flagged, then turned those findings into behavioral features that lifted customer-effort prediction precision by <span class="num">12%</span>.</li>
+            <li>Automated the training and evaluation pipeline, cutting experimentation time by <span class="num">40%</span>.</li>
+          </ul>
+        </article>
+        <article class="role">
+          <h3>Gen AI Intern <span>· Ambit Software, India</span></h3><time>Jun 2023 – Aug 2023</time>
+          <ul>
+            <li>Built and integrated a generative-AI tool into client CRM platforms, taking repetitive workflow steps off enterprise users.</li>
+            <li>Replaced a manual support-intake process with a customer ticketing portal on PowerApps with a custom HTML/CSS front end.</li>
+            <li>Turned recurring manual data pulls into a scheduled Power Automate and Power BI pipeline for client feedback reporting.</li>
+          </ul>
+        </article>
+        <article class="role">
+          <h3>Undergraduate Researcher, USIP <span>· University of Houston &amp; NASA</span></h3><time>Aug 2022 – Aug 2024</time>
+          <ul>
+            <li>Ran the processing pipeline for the microplastics, radio and other payload teams, turning <span class="num">75K+</span> raw telemetry datapoints per flight into analysis-ready datasets.</li>
+            <li>Selected for NASA-funded balloon missions: the 2023 Alaska aurora campaign and the 2024 Texas solar eclipse. Built Python and MATLAB pipelines with version-controlled workflows so results stayed reproducible across teams.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="education">
+    <div class="wrap">
+      <h2>Education</h2>
+      <div>
+        <article class="role">
+          <h3>B.S. Computer Science, Minor in Mathematics <span>· University of Houston</span></h3><time>Aug 2022 – May 2026</time>
+          <p>GPA 3.72 / 4.00 · Dean's List · Academic Excellence Scholarship. Coursework included Mathematical Introduction to Options, Probability, Statistics, Linear Algebra, Algorithms and Data Science.</p>
+        </article>
+        <article class="role">
+          <h3>Postgraduate, Sports Analytics <span>· Barça Innovation Hub (FC Barcelona)</span></h3><time>Expected May 2027</time>
+          <p>Remote programme.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="awards">
+    <div class="wrap">
+      <h2>Awards</h2>
+      <div class="awards">
+        <div><div class="place">1st</div><h3>Best Overall App, RowdyHacks 2024</h3><p>First among 87 teams and 550+ participants with a real-time sign language interpreter, built from scratch in 24 hours.</p></div>
+        <div><div class="place">3rd</div><h3>Best College Campus Solution, UH Ideathon 2024</h3><p>One of 6 finalists chosen from 56 teams and 200+ applicants. Built in 24 hours as Team Bytesters.</p></div>
+        <div><div class="place">Merit</div><h3>Academic Excellence Scholarship</h3><p>University of Houston merit scholarship.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="toolkit">
+    <div class="wrap">
+      <h2>Toolkit</h2>
+      <dl class="toolkit">
+        <div><dt>Quant &amp; statistics</dt><dd>Probability, statistical inference, time-series analysis, point-in-time backtesting, options pricing and Greeks, position sizing and risk</dd></div>
+        <div><dt>AI / LLM</dt><dd>Anthropic (Claude) and OpenAI APIs, structured JSON outputs, tool use, MCP, RAG, LLM-as-judge, evaluation and guardrails</dd></div>
+        <div><dt>Data &amp; ML</dt><dd>pandas, NumPy, scikit-learn, SHAP, PyTorch, OpenCV, YOLOv8</dd></div>
+        <div><dt>Engineering</dt><dd>Python, C++, SQL, TypeScript, JavaScript, FastAPI, Next.js, React, Node.js, PostgreSQL, GitHub Actions</dd></div>
+        <div><dt>Automation</dt><dd>Power Automate, PowerApps, Power BI</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="block contact" id="contact">
+    <div class="wrap">
+      <h2>Contact</h2>
+      <div>
+        <h3>Working on markets, RL or agent tooling? Let's talk.</h3>
+        <p>Email is the quickest way to reach me.</p>
+        <dl class="reach">
+          <div><dt>Email</dt><dd><a href="mailto:anishdokania999@gmail.com">anishdokania999@gmail.com</a></dd></div>
+          <div><dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/anishdokania/" target="_blank" rel="noopener">linkedin.com/in/anishdokania</a></dd></div>
+          <div><dt>GitHub</dt><dd><a href="https://github.com/anishdokania" target="_blank" rel="noopener">github.com/anishdokania</a></dd></div>
+          <div><dt>Devpost</dt><dd><a href="https://devpost.com/anishdokania" target="_blank" rel="noopener">devpost.com/anishdokania</a></dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="mono">© <span id="yr">2026</span> Anish Dokania</span>
+    <span class="mono">Houston, TX</span>
+  </div>
+</footer>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+// Hero chart: a simulated session where price dips under VWAP and reclaims it.
+(function () {
+  var c = document.getElementById('chart'), ctx = c.getContext('2d');
+  var css = getComputedStyle(document.documentElement);
+  var col = function (n) { return css.getPropertyValue(n).trim(); };
+  var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647 - .5; }
+
+  var N = 390, price = [], vwap = [], p = 100, pv = 0, vol = 0;
+  for (var i = 0; i < N; i++) {
+    var t = i / N;
+    var drift = t < .12 ? .05 : t < .34 ? -.07 : t < .5 ? .09 : .028;
+    p += drift + rnd() * .34;
+    var v = 1 + Math.abs(rnd()) * 2 + (t < .1 || t > .9 ? 2 : 0);
+    pv += p * v; vol += v;
+    price.push(p); vwap.push(pv / vol);
+  }
+  var reclaim = -1;
+  for (i = 60; i < N; i++) if (price[i - 1] < vwap[i - 1] && price[i] >= vwap[i] && price[i - 20] < vwap[i - 20]) { reclaim = i; break; }
+
+  var lo = Math.min.apply(null, price), hi = Math.max.apply(null, price);
+  var W = c.width, H = c.height, padX = 8, padY = 28;
+  var X = function (i) { return padX + i / (N - 1) * (W - padX * 2); };
+  var Y = function (v) { return H - padY - (v - lo) / (hi - lo) * (H - padY * 2); };
+
+  function draw(n) {
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = col('--line'); ctx.lineWidth = 1;
+    for (var g = 0; g <= 4; g++) { var y = padY + g * (H - padY * 2) / 4; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+    var grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, 'rgba(79,209,176,.22)'); grad.addColorStop(1, 'rgba(79,209,176,0)');
+    ctx.beginPath(); ctx.moveTo(X(0), H);
+    for (var i = 0; i < n; i++) ctx.lineTo(X(i), Y(price[i]));
+    ctx.lineTo(X(n - 1), H); ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+
+    ctx.lineJoin = 'round';
+    ctx.beginPath(); for (i = 0; i < n; i++) ctx[i ? 'lineTo' : 'moveTo'](X(i), Y(vwap[i]));
+    ctx.strokeStyle = col('--accent'); ctx.lineWidth = 3; ctx.setLineDash([10, 8]); ctx.stroke(); ctx.setLineDash([]);
+
+    ctx.beginPath(); for (i = 0; i < n; i++) ctx[i ? 'lineTo' : 'moveTo'](X(i), Y(price[i]));
+    ctx.strokeStyle = col('--up'); ctx.lineWidth = 3.5; ctx.stroke();
+
+    if (reclaim > 0 && n > reclaim) {
+      var rx = X(reclaim), ry = Y(price[reclaim]);
+      ctx.beginPath(); ctx.arc(rx, ry, 9, 0, Math.PI * 2); ctx.fillStyle = col('--bg'); ctx.fill();
+      ctx.lineWidth = 3.5; ctx.strokeStyle = col('--accent'); ctx.stroke();
+      ctx.font = '500 22px "JetBrains Mono", monospace'; ctx.fillStyle = col('--fg');
+      ctx.textAlign = rx > W * .7 ? 'right' : 'left';
+      ctx.fillText('RECLAIM', rx + (rx > W * .7 ? -18 : 18), ry + 34);
+    }
+    ctx.beginPath(); ctx.arc(X(n - 1), Y(price[n - 1]), 6, 0, Math.PI * 2); ctx.fillStyle = col('--up'); ctx.fill();
+  }
+
+  draw(N); // complete at rest
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var n = 2, start = null;
+    requestAnimationFrame(function step(ts) {
+      if (!start) start = ts;
+      n = Math.min(N, Math.max(2, Math.round((ts - start) / 1800 * N)));
+      draw(n);
+      if (n < N) requestAnimationFrame(step);
+    });
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { draw(N); });
+})();
+</script>
+</body>
+</html>
